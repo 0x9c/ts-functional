@@ -1,0 +1,49 @@
+name: NPM Publish
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  default:
+    name: NPM Publish
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.release.target_commitish }}
+
+    - name: Setup NODE.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+        registry-url: 'https://registry.npmjs.org'
+
+    - name: Installing Dependencies
+      run: yarn
+
+    - name: Linting Codebase
+      run: yarn lint
+
+    - name: Unit Testing
+      run: yarn test
+
+    - name: Version bumping
+      run: |
+        git config --global user.email "alexey.bedonik@gmail.com"
+        git config --global user.name "Alexey Bedonik"
+        yarn version --new-version ${{ github.event.release.tag_name }}
+
+    - name: Code compilation
+      run: yarn compile
+
+    - name: Package publishing
+      run: yarn publish --access public --tag ${{ github.event.release.target_commitish }}
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+    - name: Version pushing
+      run: git push
+      env:
+        github-token: ${{ secrets.GITHUB_TOKEN }}

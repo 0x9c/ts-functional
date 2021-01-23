@@ -1,0 +1,29 @@
+name: Quality Check
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  default:
+    name: Quality Check
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Setup NODE.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+        registry-url: 'https://registry.npmjs.org'
+
+    - name: Installing Dependencies
+      run: yarn
+
+    - name: Linting Codebase
+      run: yarn lint
+
+    - name: Unit Testing
+      run: yarn test
