@@ -1,4 +1,4 @@
-name: Quality Check
+name: main
 
 on:
   push:
